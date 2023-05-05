@@ -26,9 +26,17 @@ class ModelTrainer:
     def initiate_model_training(self,train_array,test_array,preprocessor_path):
         try:
             X_train,y_train,X_test,y_test=train_array[:,:-1],train_array[:,-1],test_array[:,:-1],test_array[:,-1]
-            models={'linear regression':LinearRegression(),'decisiontree regression':DecisionTreeRegressor(),'XG boost':XGBRegressor(),
-                    'catboost':CatBoostRegressor(),'adaboost':AdaBoostRegressor(),'gradientboost':GradientBoostingRegressor(),'randomforest':RandomForestRegressor()}
-            report=evaluate_models(X_train,X_test,y_train,y_test,models)
+            models={'linear regression':LinearRegression(),'decisiontree regression':DecisionTreeRegressor(),
+                    'XG boost':XGBRegressor(),'catboost':CatBoostRegressor(),
+                    'adaboost':AdaBoostRegressor(),'gradientboost':GradientBoostingRegressor(),
+                    'randomforest':RandomForestRegressor()}
+            param={'linear regression':{},'decisiontree regression':{'criterion':['squared_error', 'friedman_mse', 'absolute_error']},
+                    'XG boost':{'learning_rate':[.1,.01,.05,.001],'n_estimators': [8,16,32,64,128,256]},'catboost':{'depth': [6,8,10],'iterations': [30, 50, 100]},
+                    'adaboost':{'learning_rate':[.1,.01,0.5,.001],'n_estimators': [8,16,32,64,128,256]},
+                    'gradientboost':{'learning_rate':[.1,.01,.05,.001],'n_estimators': [8,16,32,64,128,256]},
+                      'randomforest':{'n_estimators': [8,16,32,64,128,256]}}
+                       
+            report=evaluate_models(X_train,X_test,y_train,y_test,models,params=param)
             models_keys=list(models.keys())
             best_score=np.max(list(report.values()))
             best_model_name=models_keys[np.argmax(list(report.values()))]
